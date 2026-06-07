@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lava Lamp - Character Trait Random Selector</title>
+    <meta name="description" content="A cartoon-style, kawaii interactive character trait random selector styled like a classic lava lamp with liquid wax physics.">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- SVG Clip Path for Lava Lamp Glass -->
+    <svg width="0" height="0" style="position: absolute;">
+        <defs>
+            <clipPath id="glassClip">
+                <path d="M 116 60 L 204 60 Q 238 240 260 420 L 60 420 Q 82 240 116 60 Z" />
+            </clipPath>
+        </defs>
+    </svg>
+
+    <!-- Background Animated Glow Orbs -->
+    <div class="bg-glow-orbs">
+        <div class="bg-orb bg-orb-1"></div>
+        <div class="bg-orb bg-orb-2"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Collapsible Sidebar Panel -->
+        <aside id="sidebar" class="sidebar">
+            <!-- Collapsible Toggle Tab sticking out of sidebar -->
+            <button id="drawerToggleTab" class="drawer-toggle-tab" title="Toggle Sidebar">
+                <svg id="toggleArrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+
+            <div class="sidebar-header">
+                <h1><span>●</span> Trait Selector</h1>
+            </div>
+
+            <div class="sidebar-content">
+                <!-- Section 1: Active Traits -->
+                <section>
+                    <div class="section-title">
+                        Active Traits <span id="itemCount" class="count">0</span>
+                    </div>
+                    
+                    <div class="input-group" style="flex-direction: column; gap: 8px; margin-bottom: 16px;">
+                        <input type="text" id="itemInput" placeholder="Trait value (e.g. Gold Chain)..." maxlength="20" autocomplete="off" style="width: 100%;">
+                        <input type="text" id="itemTypeInput" placeholder="Trait type (e.g. OG_Chain)..." maxlength="20" autocomplete="off" style="width: 100%; border: var(--cartoon-border-thin); padding: 10px; border-radius: 8px; font-family: var(--font-rounded); font-weight: 500; outline: none; background: #fff; color: #000;">
+                        <button id="addItemBtn" class="btn" style="width: 100%; justify-content: center;" title="Add Custom Trait">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Trait
+                        </button>
+                    </div>
+
+                    <div id="itemList" class="item-list">
+                        <!-- Trait list rendered dynamically -->
+                    </div>
+                </section>
+
+                <!-- Section 2: Presets -->
+                <section>
+                    <div class="section-title">Presets</div>
+                    <div class="preset-grid">
+                        <div class="preset-card" data-preset="char_traits">Default Traits</div>
+                        <div class="preset-card" data-preset="numbers">Numbers 1-6</div>
+                    </div>
+                </section>
+
+                <!-- Section 3: Configurations -->
+                <section>
+                    <div class="section-title">Settings</div>
+                    
+                    <!-- Token Giveaway Input -->
+                    <div class="setting-row" style="flex-direction: column; align-items: stretch; gap: 6px; margin-bottom: 12px;">
+                        <span class="setting-label" style="align-self: flex-start;">Giveaway Prize Tokens</span>
+                        <input type="number" id="tokenAmountInput" placeholder="Enter token amount..." min="1" value="100" style="width: 100%; border: var(--cartoon-border-thin); padding: 10px; border-radius: 8px; font-family: var(--font-rounded); font-weight: 500; outline: none; background: #fff; color: #000;">
+                    </div>
+
+                    <!-- Webhook URL Input -->
+                    <div class="setting-row" style="flex-direction: column; align-items: stretch; gap: 6px; margin-bottom: 12px;">
+                        <span class="setting-label" style="align-self: flex-start;">n8n Webhook URL</span>
+                        <input type="url" id="webhookUrlInput" placeholder="https://primary-production.io/webhook/..." style="width: 100%; border: var(--cartoon-border-thin); padding: 10px; border-radius: 8px; font-family: var(--font-rounded); font-weight: 500; outline: none; background: #fff; color: #000;">
+                    </div>
+
+                    <div class="setting-row">
+                        <span class="setting-label">Sound Effects</span>
+                        <label class="switch">
+                            <input type="checkbox" id="soundSwitch" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-row">
+                        <span class="setting-label">Sound Volume</span>
+                        <input type="range" id="volumeSlider" class="range-slider" min="0" max="1" step="0.05" value="0.5">
+                    </div>
+
+                    <div class="setting-row">
+                        <span class="setting-label">Fluid Speed</span>
+                        <input type="range" id="speedSlider" class="range-slider" min="0.5" max="2" step="0.1" value="1.0">
+                    </div>
+                </section>
+
+                <!-- Section 4: History -->
+                <section class="history-container">
+                    <div class="section-title">Selection History</div>
+                    <div id="historyList" class="history-list">
+                        <div class="history-item" style="color: var(--text-muted); justify-content: center; border: none; background: none;">
+                            No history yet
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </aside>
+
+        <!-- Main Display Area -->
+        <main class="main-display">
+            <div class="header-tagline">
+                <h2>Lava Lamp Selector</h2>
+                <p>Set token giveaway, then agitate fluids to select a trait</p>
+            </div>
+
+            <!-- Lava Lamp Assembly (Dual canvases: wax Canvas for background, lamp Canvas for foreground outlines & bubbles) -->
+            <div class="lava-lamp-container">
+                <canvas id="waxCanvas"></canvas>
+                <canvas id="lampCanvas"></canvas>
+            </div>
+
+            <!-- Agitate Trigger -->
+            <div class="spin-action-wrapper">
+                <button id="spinBtn" class="btn btn-spin">Agitate Lamp</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Win Result Modal Overlay -->
+    <div id="resultOverlay" class="result-overlay">
+        <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+        
+        <div class="result-card">
+            <div class="result-content">
+                <div class="result-badge">Trait Selected!</div>
+                
+                <!-- Selected Trait Cartoon Image Display -->
+                <div class="winner-image-wrapper">
+                    <img id="winnerTraitImage" src="" alt="Selected Trait">
+                </div>
+                
+                <h3 id="winnerText" class="winner-text">Trait Name</h3>
+                <p id="winnerSubtext" class="winner-subtext">The liquid wax has crystallized!</p>
+                
+                <button id="closeResultBtn" class="btn" style="width: 100%;">Equip Trait</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="audio.js"></script>
+    <script src="lamp.js"></script>
+    <script src="traits.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
