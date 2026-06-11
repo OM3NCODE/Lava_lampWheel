@@ -7,7 +7,7 @@ class LavaSelectorApp {
     constructor() {
         this.items = [];
         this.history = [];
-        
+
         // Dom Elements
         this.itemInput = document.getElementById('itemInput');
         this.itemTypeInput = document.getElementById('itemTypeInput');
@@ -19,57 +19,57 @@ class LavaSelectorApp {
         this.volumeSlider = document.getElementById('volumeSlider');
         this.speedSlider = document.getElementById('speedSlider');
         this.historyList = document.getElementById('historyList');
-        
+
         // Collapsible Sidebar Elements
         this.sidebar = document.getElementById('sidebar');
         this.drawerToggleTab = document.getElementById('drawerToggleTab');
         this.toggleArrow = document.getElementById('toggleArrow');
-        
+
         this.historySidebar = document.getElementById('historySidebar');
         this.historyDrawerToggleTab = document.getElementById('historyDrawerToggleTab');
         this.historyToggleArrow = document.getElementById('historyToggleArrow');
-        
+
         // Modal Overlay Elements
         this.resultOverlay = document.getElementById('resultOverlay');
         this.winnerText = document.getElementById('winnerText');
         this.winnerTraitImage = document.getElementById('winnerTraitImage');
         this.closeResultBtn = document.getElementById('closeResultBtn');
         this.baseGlow = document.getElementById('baseGlow');
-        
+
         // Confetti Properties
         this.confettiCanvas = document.getElementById('confettiCanvas');
         this.confettiCtx = this.confettiCanvas.getContext('2d');
         this.confettiParticles = [];
         this.confettiActive = false;
-        
+
         this.lamp = null;
-        
+
         this.init();
     }
 
     init() {
         this.loadState();
         this.renderPresets();
-        
+
         // Initialize Lava Lamp physics engine
         this.lamp = new LavaLamp('lampCanvas', 'waxCanvas', (winner) => this.handleWinner(winner));
         this.lamp.setItems(this.items);
         this.lamp.startLoop();
-        
+
         this.applySettings();
         this.bindEvents();
-        
+
         this.renderItems();
         this.renderHistory();
-        
+
         // Check window viewport size to start collapsed on mobile, open on desktop
         if (window.innerWidth <= 1024) {
             this.setSidebarCollapsed(true);
         }
-        
+
         // Collapse history by default to keep viewport clean
         this.setHistoryCollapsed(true);
-        
+
         // Load attributes from Magic Eden
         this.loadMagicEdenAttributes();
     }
@@ -90,7 +90,7 @@ class LavaSelectorApp {
                         active: item.active !== false
                     };
                 }).filter(item => item.value && item.value !== 'undefined' && item.value !== 'null');
-                
+
                 if (this.items.length === 0) {
                     this.items = JSON.parse(JSON.stringify(PRESETS.char_traits));
                 }
@@ -117,7 +117,7 @@ class LavaSelectorApp {
         if (storedSound !== null) {
             this.soundSwitch.checked = storedSound === 'true';
         }
-        
+
         const storedVol = localStorage.getItem('lava_selector_volume');
         if (storedVol !== null) {
             this.volumeSlider.value = storedVol;
@@ -136,12 +136,12 @@ class LavaSelectorApp {
 
         // Preset title element
         this.presetTitle = document.getElementById('presetTitle');
-        
+
         this.currentPresetName = localStorage.getItem('lava_selector_preset_name') || 'Show All Traits';
         if (this.presetTitle) {
             this.presetTitle.textContent = `(${this.currentPresetName})`;
         }
-        
+
         this.traitCounts = {};
     }
 
@@ -183,7 +183,7 @@ class LavaSelectorApp {
                 }
             });
         }
- 
+
         // Add Option trigger
         this.addItemBtn.addEventListener('click', () => this.addItem());
         this.itemInput.addEventListener('keypress', (e) => {
@@ -194,7 +194,7 @@ class LavaSelectorApp {
                 if (e.key === 'Enter') this.addItem();
             });
         }
-        
+
         // Sound and volume controls
         this.soundSwitch.addEventListener('change', (e) => {
             window.LavaAudio.setEnabled(e.target.checked);
@@ -231,9 +231,9 @@ class LavaSelectorApp {
                 alert("Please enable at least 1 trait to agitate the lamp!");
                 return;
             }
-            
+
             window.LavaAudio.playClick();
-            
+
             this.spinBtn.disabled = true;
             this.disableItemListActions(true);
             this.lamp.startSpin();
@@ -244,19 +244,19 @@ class LavaSelectorApp {
         // Close Result Modal
         this.closeResultBtn.addEventListener('click', () => {
             window.LavaAudio.playClick();
-            
+
             // Webhook dispatch logic
             const webhookUrl = localStorage.getItem('lava_selector_webhook_url');
             if (webhookUrl && webhookUrl.trim() !== '') {
-                 const payload = {
+                const payload = {
                     value: this.winnerText.textContent,
                     trait_type: this.lastWinnerTraitType || 'Helmets',
                     amount: this.currentPrizeTokens || 0
-                 };
-                
+                };
+
                 console.log('Sending webhook trigger to:', webhookUrl);
                 console.log('Webhook Payload:', JSON.stringify(payload, null, 2));
-                
+
                 fetch(webhookUrl, {
                     method: 'POST',
                     headers: {
@@ -264,12 +264,12 @@ class LavaSelectorApp {
                     },
                     body: JSON.stringify(payload)
                 })
-                .then(res => {
-                    console.log('Webhook dispatch response status:', res.status);
-                })
-                .catch(err => {
-                    console.error('Webhook dispatch failed:', err);
-                });
+                    .then(res => {
+                        console.log('Webhook dispatch response status:', res.status);
+                    })
+                    .catch(err => {
+                        console.error('Webhook dispatch failed:', err);
+                    });
             } else {
                 console.log('No Webhook URL configured. Skipping webhook dispatch.');
             }
@@ -277,7 +277,7 @@ class LavaSelectorApp {
             this.resultOverlay.classList.remove('active');
             this.confettiActive = false;
             this.lamp.reset();
-            
+
             this.spinBtn.disabled = false;
             this.disableItemListActions(false);
         });
@@ -333,7 +333,7 @@ class LavaSelectorApp {
         const traitType = typeInput ? typeInput.value.trim() || 'Helmets' : 'Helmets';
 
         window.LavaAudio.playClick();
-        
+
         const newItem = {
             id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
             value: text,
@@ -347,11 +347,11 @@ class LavaSelectorApp {
         this.saveState();
         this.renderItems();
         this.lamp.setItems(this.items);
-        
+
         this.currentPresetName = 'Custom';
         localStorage.setItem('lava_selector_preset_name', this.currentPresetName);
         if (this.presetTitle) this.presetTitle.textContent = `(${this.currentPresetName})`;
-        
+
         this.itemInput.value = '';
         if (typeInput) typeInput.value = '';
         this.itemInput.focus();
@@ -363,7 +363,7 @@ class LavaSelectorApp {
         this.saveState();
         this.renderItems();
         this.lamp.setItems(this.items);
-        
+
         this.currentPresetName = 'Custom';
         localStorage.setItem('lava_selector_preset_name', this.currentPresetName);
         if (this.presetTitle) this.presetTitle.textContent = `(${this.currentPresetName})`;
@@ -392,7 +392,7 @@ class LavaSelectorApp {
         this.addItemBtn.disabled = disabled;
         this.itemInput.disabled = disabled;
         if (this.itemTypeInput) this.itemTypeInput.disabled = disabled;
-        
+
         this.itemList.style.opacity = disabled ? '0.5' : '1.0';
         this.itemList.style.pointerEvents = disabled ? 'none' : 'auto';
     }
@@ -453,12 +453,12 @@ class LavaSelectorApp {
             const date = new Date(record.timestamp);
             const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             const tokenText = record.tokens ? ` (+${record.tokens} Tokens)` : '';
-            
+
             const nameText = record.value || record.text || '';
             const row = document.createElement('div');
             row.className = 'history-item';
             row.style.borderLeft = `4px solid var(--lamp-blue)`;
-            
+
             row.innerHTML = `
                 <div class="history-item-left">
                     <span class="item-color-dot" style="background-color: var(--lamp-wax); width: 8px; height: 8px;"></span>
@@ -466,7 +466,7 @@ class LavaSelectorApp {
                 </div>
                 <span class="history-time">${timeStr}</span>
             `;
-            
+
             this.historyList.appendChild(row);
         });
     }
@@ -474,7 +474,7 @@ class LavaSelectorApp {
     handleWinner(winner) {
         this.lastWinnerTraitType = winner.trait_type || 'Helmets';
         const winnerValue = winner.value || winner.text || '';
-        
+
         // Calculate dynamic prize based on Magic Eden attributes count
         const traitCount = this.getTraitCount(winner);
         const prize = Math.round(50000 / traitCount);
@@ -491,27 +491,27 @@ class LavaSelectorApp {
         };
         this.history.push(record);
         this.saveState();
-        
+
         this.renderHistory();
-        
+
         // Render victory display content
         this.winnerText.textContent = `Holders of "${winnerValue}"`;
-        
+
         const subtext = document.getElementById('winnerSubtext');
         if (subtext) {
             subtext.textContent = `win ${this.currentPrizeTokens.toLocaleString()} Tokens!`;
         }
-        
+
         if (winner.image) {
             this.winnerTraitImage.src = winner.image.replace(/#/g, '%23');
         } else {
             // Render custom kawaii bubble fallback
             this.winnerTraitImage.src = FALLBACK_BUBBLE_SVG;
         }
-        
+
         // Trigger result modal
         this.resultOverlay.classList.add('active');
-        
+
         window.LavaAudio.playChime();
         this.initConfetti();
     }
@@ -540,7 +540,7 @@ class LavaSelectorApp {
         const color = NEON_COLORS[Math.floor(Math.random() * NEON_COLORS.length)];
         const angle = Math.random() * Math.PI * 2;
         const speed = 3 + Math.random() * 9;
-        
+
         return {
             x: x,
             y: y,
@@ -561,32 +561,32 @@ class LavaSelectorApp {
         if (!this.confettiActive) return;
 
         this.confettiCtx.clearRect(0, 0, this.confettiCanvas.width, this.confettiCanvas.height);
-        
+
         let alive = false;
-        
+
         this.confettiParticles.forEach(p => {
             p.vx *= p.drag;
             p.vy *= p.drag;
             p.vy += p.gravity;
-            
+
             p.x += p.vx;
             p.y += p.vy;
-            
+
             p.rotation += p.rotationSpeed;
-            
+
             if (p.y > window.innerHeight * 0.7) {
                 p.opacity -= 0.018;
             }
-            
+
             if (p.opacity > 0 && p.y < window.innerHeight) {
                 alive = true;
-                
+
                 this.confettiCtx.save();
                 this.confettiCtx.globalAlpha = p.opacity;
                 this.confettiCtx.translate(p.x, p.y);
                 this.confettiCtx.rotate(p.rotation * Math.PI / 180);
                 this.confettiCtx.fillStyle = p.color;
-                
+
                 this.confettiCtx.fillRect(-p.width / 2, -p.height / 2, p.width, p.height);
                 this.confettiCtx.restore();
             }
@@ -612,7 +612,7 @@ class LavaSelectorApp {
             this.saveState();
             this.renderItems();
             this.lamp.setItems(this.items);
-            
+
             this.currentPresetName = 'Show All Traits';
             localStorage.setItem('lava_selector_preset_name', this.currentPresetName);
             if (this.presetTitle) this.presetTitle.textContent = `(${this.currentPresetName})`;
@@ -641,7 +641,7 @@ class LavaSelectorApp {
                 this.saveState();
                 this.renderItems();
                 this.lamp.setItems(this.items);
-                
+
                 this.currentPresetName = category;
                 localStorage.setItem('lava_selector_preset_name', this.currentPresetName);
                 if (this.presetTitle) this.presetTitle.textContent = `(${this.currentPresetName})`;
@@ -659,97 +659,113 @@ class LavaSelectorApp {
             this.saveState();
             this.renderItems();
             this.lamp.setItems(this.items);
-            
+
             this.currentPresetName = 'Numbers 1-6';
             localStorage.setItem('lava_selector_preset_name', this.currentPresetName);
             if (this.presetTitle) this.presetTitle.textContent = `(${this.currentPresetName})`;
         });
         presetGrid.appendChild(numbersCard);
     }
-    
+
     async loadMagicEdenAttributes() {
-        try {
-            let res;
+        const urls = [
+            'https://api-mainnet.magiceden.dev/v2/collections/hauwee/attributes',
+            'https://corsproxy.io/?https://api-mainnet.magiceden.dev/v2/collections/hauwee/attributes',
+            'https://api.allorigins.win/raw?url=https://api-mainnet.magiceden.dev/v2/collections/hauwee/attributes',
+            '/api/attributes',
+            './attributes.json'
+        ];
+
+        let data = null;
+        for (const url of urls) {
             try {
-                // Try direct API first (ideal for static hosts like GitHub Pages if CORS is open)
-                res = await fetch('https://api-mainnet.magiceden.dev/v2/collections/hauwee/attributes');
-            } catch (err) {
-                console.warn('Direct Magic Eden fetch failed/CORS blocked. Trying local proxy...');
-                // Fallback to local node proxy
-                res = await fetch('/api/attributes');
-            }
-            
-            if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-            const data = await res.json();
-            
-            this.traitCounts = {};
-            let attributesList = null;
-            
-            if (data && data.results && Array.isArray(data.results.availableAttributes)) {
-                attributesList = data.results.availableAttributes;
-            } else if (data && Array.isArray(data.availableAttributes)) {
-                attributesList = data.availableAttributes;
-            }
-            
-            if (Array.isArray(attributesList)) {
-                attributesList.forEach(item => {
-                    if (item && item.attribute) {
-                        const traitType = String(item.attribute.trait_type || '').toLowerCase().trim();
-                        const valName = String(item.attribute.value || '').toLowerCase().trim();
-                        
-                        // Sum all listing types to get total collection supply for this trait
-                        let count = 0;
-                        if (item.countByListingType) {
-                            Object.values(item.countByListingType).forEach(val => {
-                                count += parseInt(val) || 0;
-                            });
-                        } else {
-                            count = parseInt(item.count) || 0;
-                        }
-                        
-                        if (traitType && valName && !isNaN(count) && count > 0) {
-                            this.traitCounts[traitType + '::' + valName] = count;
-                        }
-                    }
-                });
-            }
-            console.log('Loaded Magic Eden trait counts successfully:', Object.keys(this.traitCounts).length, 'traits');
-        } catch (e) {
-            console.error('Failed to load Magic Eden attributes:', e);
-        }
-    }
-    
-    getTraitCount(winner) {
-        const type = String(winner.trait_type || '').toLowerCase().trim();
-        const value = String(winner.value || winner.text || '').toLowerCase().trim();
-        const key = type + '::' + value;
-        
-        // 1. Try Magic Eden loaded data
-        if (this.traitCounts && this.traitCounts[key] !== undefined) {
-            return this.traitCounts[key];
-        }
-        
-        // 2. Try parsing from filename (e.g. Purple Spray #54.005.png -> 54)
-        if (winner.image) {
-            const match = winner.image.match(/#(\d+)/);
-            if (match) {
-                const count = parseInt(match[1]);
-                if (!isNaN(count) && count > 0) {
-                    return count;
+                console.log(`Attempting to fetch attributes from: ${url}`);
+                const res = await fetch(url);
+                if (res.ok) {
+                    data = await res.json();
+                    console.log(`Successfully loaded attributes from: ${url}`);
+                    break;
+                } else {
+                    console.warn(`Fetch from ${url} returned status ${res.status}`);
                 }
+            } catch (err) {
+                console.warn(`Failed to fetch/parse from ${url}:`, err);
             }
         }
-        
-        // 3. Try to count occurrences in items list
-        const occurrences = this.items.filter(item => String(item.value || '').toLowerCase().trim() === value).length;
-        if (occurrences > 0) {
-            return occurrences;
+
+        if (!data) {
+            throw new Error('All attempts to load Magic Eden attributes failed.');
         }
-        
-        // 4. Default fallback
-        return 1;
+
+        this.traitCounts = {};
+        let attributesList = null;
+
+        if (data && data.results && Array.isArray(data.results.availableAttributes)) {
+            attributesList = data.results.availableAttributes;
+        } else if (data && Array.isArray(data.availableAttributes)) {
+            attributesList = data.availableAttributes;
+        }
+
+        if (Array.isArray(attributesList)) {
+            attributesList.forEach(item => {
+                if (item && item.attribute) {
+                    const traitType = String(item.attribute.trait_type || '').toLowerCase().trim();
+                    const valName = String(item.attribute.value || '').toLowerCase().trim();
+
+                    // Sum all listing types to get total collection supply for this trait
+                    let count = 0;
+                    if (item.countByListingType) {
+                        Object.values(item.countByListingType).forEach(val => {
+                            count += parseInt(val) || 0;
+                        });
+                    } else {
+                        count = parseInt(item.count) || 0;
+                    }
+
+                    if (traitType && valName && !isNaN(count) && count > 0) {
+                        this.traitCounts[traitType + '::' + valName] = count;
+                    }
+                }
+            });
+        }
+        console.log('Loaded Magic Eden trait counts successfully:', Object.keys(this.traitCounts).length, 'traits');
+    } catch(e) {
+        console.error('Failed to load Magic Eden attributes:', e);
     }
 }
+
+getTraitCount(winner)
+{
+    const type = String(winner.trait_type || '').toLowerCase().trim();
+    const value = String(winner.value || winner.text || '').toLowerCase().trim();
+    const key = type + '::' + value;
+
+    // 1. Try Magic Eden loaded data
+    if (this.traitCounts && this.traitCounts[key] !== undefined) {
+        return this.traitCounts[key];
+    }
+
+    // 2. Try parsing from filename (e.g. Purple Spray #54.005.png -> 54)
+    if (winner.image) {
+        const match = winner.image.match(/#(\d+)/);
+        if (match) {
+            const count = parseInt(match[1]);
+            if (!isNaN(count) && count > 0) {
+                return count;
+            }
+        }
+    }
+
+    // 3. Try to count occurrences in items list
+    const occurrences = this.items.filter(item => String(item.value || '').toLowerCase().trim() === value).length;
+    if (occurrences > 0) {
+        return occurrences;
+    }
+
+    // 4. Default fallback
+    return 1;
+}
+
 
 // Instantiate on window load
 window.addEventListener('DOMContentLoaded', () => {
