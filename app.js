@@ -668,102 +668,103 @@ class LavaSelectorApp {
     }
 
     async loadMagicEdenAttributes() {
-        const urls = [
-            'https://api-mainnet.magiceden.dev/v2/collections/hauwee/attributes',
-            'https://corsproxy.io/?https://api-mainnet.magiceden.dev/v2/collections/hauwee/attributes',
-            'https://api.allorigins.win/raw?url=https://api-mainnet.magiceden.dev/v2/collections/hauwee/attributes',
-            '/api/attributes',
-            './attributes.json'
-        ];
+        try {
+            const urls = [
+                'https://api-mainnet.magiceden.dev/v2/collections/hauwee/attributes',
+                'https://corsproxy.io/?https://api-mainnet.magiceden.dev/v2/collections/hauwee/attributes',
+                'https://api.allorigins.win/raw?url=https://api-mainnet.magiceden.dev/v2/collections/hauwee/attributes',
+                '/api/attributes',
+                './attributes.json'
+            ];
 
-        let data = null;
-        for (const url of urls) {
-            try {
-                console.log(`Attempting to fetch attributes from: ${url}`);
-                const res = await fetch(url);
-                if (res.ok) {
-                    data = await res.json();
-                    console.log(`Successfully loaded attributes from: ${url}`);
-                    break;
-                } else {
-                    console.warn(`Fetch from ${url} returned status ${res.status}`);
-                }
-            } catch (err) {
-                console.warn(`Failed to fetch/parse from ${url}:`, err);
-            }
-        }
-
-        if (!data) {
-            throw new Error('All attempts to load Magic Eden attributes failed.');
-        }
-
-        this.traitCounts = {};
-        let attributesList = null;
-
-        if (data && data.results && Array.isArray(data.results.availableAttributes)) {
-            attributesList = data.results.availableAttributes;
-        } else if (data && Array.isArray(data.availableAttributes)) {
-            attributesList = data.availableAttributes;
-        }
-
-        if (Array.isArray(attributesList)) {
-            attributesList.forEach(item => {
-                if (item && item.attribute) {
-                    const traitType = String(item.attribute.trait_type || '').toLowerCase().trim();
-                    const valName = String(item.attribute.value || '').toLowerCase().trim();
-
-                    // Sum all listing types to get total collection supply for this trait
-                    let count = 0;
-                    if (item.countByListingType) {
-                        Object.values(item.countByListingType).forEach(val => {
-                            count += parseInt(val) || 0;
-                        });
+            let data = null;
+            for (const url of urls) {
+                try {
+                    console.log(`Attempting to fetch attributes from: ${url}`);
+                    const res = await fetch(url);
+                    if (res.ok) {
+                        data = await res.json();
+                        console.log(`Successfully loaded attributes from: ${url}`);
+                        break;
                     } else {
-                        count = parseInt(item.count) || 0;
+                        console.warn(`Fetch from ${url} returned status ${res.status}`);
                     }
-
-                    if (traitType && valName && !isNaN(count) && count > 0) {
-                        this.traitCounts[traitType + '::' + valName] = count;
-                    }
+                } catch (err) {
+                    console.warn(`Failed to fetch/parse from ${url}:`, err);
                 }
-            });
+            }
+
+            if (!data) {
+                throw new Error('All attempts to load Magic Eden attributes failed.');
+            }
+
+            this.traitCounts = {};
+            let attributesList = null;
+
+            if (data && data.results && Array.isArray(data.results.availableAttributes)) {
+                attributesList = data.results.availableAttributes;
+            } else if (data && Array.isArray(data.availableAttributes)) {
+                attributesList = data.availableAttributes;
+            }
+
+            if (Array.isArray(attributesList)) {
+                attributesList.forEach(item => {
+                    if (item && item.attribute) {
+                        const traitType = String(item.attribute.trait_type || '').toLowerCase().trim();
+                        const valName = String(item.attribute.value || '').toLowerCase().trim();
+
+                        // Sum all listing types to get total collection supply for this trait
+                        let count = 0;
+                        if (item.countByListingType) {
+                            Object.values(item.countByListingType).forEach(val => {
+                                count += parseInt(val) || 0;
+                            });
+                        } else {
+                            count = parseInt(item.count) || 0;
+                        }
+
+                        if (traitType && valName && !isNaN(count) && count > 0) {
+                            this.traitCounts[traitType + '::' + valName] = count;
+                        }
+                    }
+                });
+            }
+            console.log('Loaded Magic Eden trait counts successfully:', Object.keys(this.traitCounts).length, 'traits');
+        } catch (e) {
+            console.error('Failed to load Magic Eden attributes:', e);
         }
-        console.log('Loaded Magic Eden trait counts successfully:', Object.keys(this.traitCounts).length, 'traits');
-    } catch(e) {
-        console.error('Failed to load Magic Eden attributes:', e);
-    }
-}
-
-getTraitCount(winner)
-{
-    const type = String(winner.trait_type || '').toLowerCase().trim();
-    const value = String(winner.value || winner.text || '').toLowerCase().trim();
-    const key = type + '::' + value;
-
-    // 1. Try Magic Eden loaded data
-    if (this.traitCounts && this.traitCounts[key] !== undefined) {
-        return this.traitCounts[key];
     }
 
-    // 2. Try parsing from filename (e.g. Purple Spray #54.005.png -> 54)
-    if (winner.image) {
-        const match = winner.image.match(/#(\d+)/);
-        if (match) {
-            const count = parseInt(match[1]);
-            if (!isNaN(count) && count > 0) {
-                return count;
+    getTraitCount(winner) {
+        const type = String(winner.trait_type || '').toLowerCase().trim();
+        const value = String(winner.value || winner.text || '').toLowerCase().trim();
+        const key = type + '::' + value;
+
+        // 1. Try Magic Eden loaded data
+        if (this.traitCounts && this.traitCounts[key] !== undefined) {
+            return this.traitCounts[key];
+        }
+
+        // 2. Try parsing from filename (e.g. Purple Spray #54.005.png -> 54)
+        if (winner.image) {
+            const match = winner.image.match(/#(\d+)/);
+            if (match) {
+                const count = parseInt(match[1]);
+                if (!isNaN(count) && count > 0) {
+                    return count;
+                }
             }
         }
-    }
 
-    // 3. Try to count occurrences in items list
-    const occurrences = this.items.filter(item => String(item.value || '').toLowerCase().trim() === value).length;
-    if (occurrences > 0) {
-        return occurrences;
-    }
+        // 3. Try to count occurrences in items list
+        const occurrences = this.items.filter(item => String(item.value || '').toLowerCase().trim() === value).length;
+        if (occurrences > 0) {
+            return occurrences;
+        }
 
-    // 4. Default fallback
-    return 1;
+        // 4. Default fallback
+        return 1;
+    }
 }
 
 
