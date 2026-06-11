@@ -13,12 +13,34 @@ const MIME_TYPES = {
     '.jpg': 'image/jpeg',
     '.gif': 'image/gif',
     '.svg': 'image/svg+xml',
-    '.ico': 'image/x-icon'
+    '.ico': 'image/x-icon',
+    '.ttf': 'font/ttf'
 };
 
 const server = http.createServer((req, res) => {
-    // Sanitize path to prevent directory traversal
-    let safeUrl = req.url.split('?')[0];
+    // Sanitize path to prevent directory traversal and decode percent-encoded URLs (e.g. %23 -> #)
+    let safeUrl = decodeURIComponent(req.url.split('?')[0]);
+    
+    // Magic Eden Attributes proxy endpoint to prevent browser CORS block
+    if (safeUrl === '/api/attributes') {
+        const https = require('https');
+        https.get('https://api-mainnet.magiceden.dev/v2/collections/hauwee/attributes', (apiRes) => {
+            let data = '';
+            apiRes.on('data', (chunk) => { data += chunk; });
+            apiRes.on('end', () => {
+                res.writeHead(200, { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                });
+                res.end(data);
+            });
+        }).on('error', (err) => {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end(`Error fetching Magic Eden V2 API: ${err.message}`);
+        });
+        return;
+    }
+    
     let filePath = path.join(__dirname, safeUrl === '/' ? 'index.html' : safeUrl);
 
     // Prevent access outside directory

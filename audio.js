@@ -214,6 +214,48 @@ class LavaAudioEngine {
             osc.stop(noteStart + 1.3);
         });
     }
+
+    // Synthesize a funny cartoon-style fart sound
+    playFart() {
+        if (!this.enabled) return;
+        this.resume();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const filter = this.ctx.createBiquadFilter();
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.masterVolume);
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(110, now);
+        osc.frequency.linearRampToValueAtTime(35, now + 0.4);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(280, now);
+        filter.frequency.linearRampToValueAtTime(90, now + 0.4);
+
+        // Amplitude modulation for fluttering/tremolo effect
+        const modOsc = this.ctx.createOscillator();
+        const modGain = this.ctx.createGain();
+        modOsc.type = 'sine';
+        modOsc.frequency.value = 16; // 16 Hz flutter
+        modGain.gain.value = 0.45;
+
+        modOsc.connect(modGain);
+        modGain.connect(gain.gain);
+
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
+
+        modOsc.start(now);
+        modOsc.stop(now + 0.42);
+        osc.start(now);
+        osc.stop(now + 0.42);
+    }
 }
 
 // Export singleton instance

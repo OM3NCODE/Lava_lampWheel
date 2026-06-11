@@ -25,6 +25,10 @@ class LavaSelectorApp {
         this.drawerToggleTab = document.getElementById('drawerToggleTab');
         this.toggleArrow = document.getElementById('toggleArrow');
         
+        this.historySidebar = document.getElementById('historySidebar');
+        this.historyDrawerToggleTab = document.getElementById('historyDrawerToggleTab');
+        this.historyToggleArrow = document.getElementById('historyToggleArrow');
+        
         // Modal Overlay Elements
         this.resultOverlay = document.getElementById('resultOverlay');
         this.winnerText = document.getElementById('winnerText');
@@ -45,6 +49,7 @@ class LavaSelectorApp {
 
     init() {
         this.loadState();
+        this.renderPresets();
         
         // Initialize Lava Lamp physics engine
         this.lamp = new LavaLamp('lampCanvas', 'waxCanvas', (winner) => this.handleWinner(winner));
@@ -61,6 +66,12 @@ class LavaSelectorApp {
         if (window.innerWidth <= 1024) {
             this.setSidebarCollapsed(true);
         }
+        
+        // Collapse history by default to keep viewport clean
+        this.setHistoryCollapsed(true);
+        
+        // Load attributes from Magic Eden
+        this.loadMagicEdenAttributes();
     }
 
     loadState() {
@@ -122,6 +133,16 @@ class LavaSelectorApp {
         if (storedWebhook !== null && webhookUrlInput) {
             webhookUrlInput.value = storedWebhook;
         }
+
+        // Preset title element
+        this.presetTitle = document.getElementById('presetTitle');
+        
+        this.currentPresetName = localStorage.getItem('lava_selector_preset_name') || 'Show All Traits';
+        if (this.presetTitle) {
+            this.presetTitle.textContent = `(${this.currentPresetName})`;
+        }
+        
+        this.traitCounts = {};
     }
 
     saveState() {
@@ -137,6 +158,32 @@ class LavaSelectorApp {
             this.setSidebarCollapsed(isCollapsed);
         });
 
+        // Collapsible History Sidebar Trigger
+        if (this.historyDrawerToggleTab) {
+            this.historyDrawerToggleTab.addEventListener('click', () => {
+                window.LavaAudio.playClick();
+                const isCollapsed = !this.historySidebar.classList.contains('collapsed');
+                this.setHistoryCollapsed(isCollapsed);
+            });
+        }
+
+        // Add Custom Trait collapsible accordion toggle
+        const addTraitToggle = document.getElementById('addTraitToggle');
+        const addTraitContent = document.getElementById('addTraitContent');
+        if (addTraitToggle && addTraitContent) {
+            addTraitToggle.addEventListener('click', () => {
+                window.LavaAudio.playClick();
+                const isExpanded = addTraitContent.style.maxHeight !== '0px' && addTraitContent.style.maxHeight !== '';
+                if (isExpanded) {
+                    addTraitContent.style.maxHeight = '0px';
+                    addTraitToggle.querySelector('.dropdown-arrow').style.transform = 'rotate(0deg)';
+                } else {
+                    addTraitContent.style.maxHeight = '200px';
+                    addTraitToggle.querySelector('.dropdown-arrow').style.transform = 'rotate(180deg)';
+                }
+            });
+        }
+ 
         // Add Option trigger
         this.addItemBtn.addEventListener('click', () => this.addItem());
         this.itemInput.addEventListener('keypress', (e) => {
@@ -179,21 +226,11 @@ class LavaSelectorApp {
 
         // Agitate/Spin Button
         this.spinBtn.addEventListener('click', () => {
-            const tokenAmountInput = document.getElementById('tokenAmountInput');
-            const tokenAmountVal = tokenAmountInput ? tokenAmountInput.value.trim() : '';
-            if (!tokenAmountVal || isNaN(tokenAmountVal) || parseInt(tokenAmountVal) <= 0) {
-                alert("Please enter a valid giveaway prize token amount (> 0) before agitating the lamp!");
-                if (tokenAmountInput) tokenAmountInput.focus();
-                return;
-            }
-            
             const activeCount = this.items.filter(item => item.active).length;
             if (activeCount < 1) {
                 alert("Please enable at least 1 trait to agitate the lamp!");
                 return;
             }
-            
-            this.currentPrizeTokens = parseInt(tokenAmountVal);
             
             window.LavaAudio.playClick();
             
@@ -202,19 +239,7 @@ class LavaSelectorApp {
             this.lamp.startSpin();
         });
 
-        // Presets cards
-        document.querySelectorAll('.preset-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                window.LavaAudio.playClick();
-                const presetKey = e.currentTarget.getAttribute('data-preset');
-                if (PRESETS[presetKey]) {
-                    this.items = JSON.parse(JSON.stringify(PRESETS[presetKey]));
-                    this.saveState();
-                    this.renderItems();
-                    this.lamp.setItems(this.items);
-                }
-            });
-        });
+        // Webhook URL Input change listener has loaded custom settings already
 
         // Close Result Modal
         this.closeResultBtn.addEventListener('click', () => {
@@ -278,6 +303,19 @@ class LavaSelectorApp {
         }
     }
 
+    setHistoryCollapsed(collapsed) {
+        const appContainer = document.querySelector('.app-container');
+        if (collapsed) {
+            this.historySidebar.classList.add('collapsed');
+            this.historyToggleArrow.style.transform = 'rotate(180deg)';
+            appContainer.classList.add('history-collapsed-state');
+        } else {
+            this.historySidebar.classList.remove('collapsed');
+            this.historyToggleArrow.style.transform = 'rotate(0deg)';
+            appContainer.classList.remove('history-collapsed-state');
+        }
+    }
+
     applySettings() {
         window.LavaAudio.setEnabled(this.soundSwitch.checked);
         window.LavaAudio.setVolume(parseFloat(this.volumeSlider.value));
@@ -310,6 +348,10 @@ class LavaSelectorApp {
         this.renderItems();
         this.lamp.setItems(this.items);
         
+        this.currentPresetName = 'Custom';
+        localStorage.setItem('lava_selector_preset_name', this.currentPresetName);
+        if (this.presetTitle) this.presetTitle.textContent = `(${this.currentPresetName})`;
+        
         this.itemInput.value = '';
         if (typeInput) typeInput.value = '';
         this.itemInput.focus();
@@ -321,6 +363,10 @@ class LavaSelectorApp {
         this.saveState();
         this.renderItems();
         this.lamp.setItems(this.items);
+        
+        this.currentPresetName = 'Custom';
+        localStorage.setItem('lava_selector_preset_name', this.currentPresetName);
+        if (this.presetTitle) this.presetTitle.textContent = `(${this.currentPresetName})`;
     }
 
     toggleItemActive(id) {
@@ -334,6 +380,10 @@ class LavaSelectorApp {
         this.saveState();
         this.renderItems();
         this.lamp.setItems(this.items);
+
+        this.currentPresetName = 'Custom';
+        localStorage.setItem('lava_selector_preset_name', this.currentPresetName);
+        if (this.presetTitle) this.presetTitle.textContent = `(${this.currentPresetName})`;
     }
 
     disableItemListActions(disabled) {
@@ -424,9 +474,19 @@ class LavaSelectorApp {
     handleWinner(winner) {
         this.lastWinnerTraitType = winner.trait_type || 'Helmets';
         const winnerValue = winner.value || winner.text || '';
+        
+        // Calculate dynamic prize based on Magic Eden attributes count
+        const traitCount = this.getTraitCount(winner);
+        const prize = Math.round(50000 / traitCount);
+        this.currentPrizeTokens = prize;
+
+        console.log(`[Winner Selected] Trait: "${winnerValue}" | Type: "${this.lastWinnerTraitType}"`);
+        console.log(`- Resolved Mint Count: ${traitCount}`);
+        console.log(`- Payout Calculation: 50,000 / ${traitCount} = ${prize} $UBP`);
+
         const record = {
             value: winnerValue,
-            tokens: this.currentPrizeTokens || 0,
+            tokens: this.currentPrizeTokens,
             timestamp: Date.now()
         };
         this.history.push(record);
@@ -435,15 +495,15 @@ class LavaSelectorApp {
         this.renderHistory();
         
         // Render victory display content
-        this.winnerText.textContent = winnerValue;
+        this.winnerText.textContent = `Holders of "${winnerValue}"`;
         
         const subtext = document.getElementById('winnerSubtext');
         if (subtext) {
-            subtext.textContent = `Equipped: ${winnerValue} + Received ${this.currentPrizeTokens || 0} Tokens!`;
+            subtext.textContent = `win ${this.currentPrizeTokens.toLocaleString()} Tokens!`;
         }
         
         if (winner.image) {
-            this.winnerTraitImage.src = winner.image;
+            this.winnerTraitImage.src = winner.image.replace(/#/g, '%23');
         } else {
             // Render custom kawaii bubble fallback
             this.winnerTraitImage.src = FALLBACK_BUBBLE_SVG;
@@ -535,6 +595,159 @@ class LavaSelectorApp {
         if (alive) {
             requestAnimationFrame(() => this.animateConfetti());
         }
+    }
+
+    renderPresets() {
+        const presetGrid = document.getElementById('presetGrid');
+        if (!presetGrid) return;
+        presetGrid.innerHTML = '';
+
+        // 1. Show All Traits
+        const showAllCard = document.createElement('div');
+        showAllCard.className = 'preset-card';
+        showAllCard.textContent = 'Show All Traits';
+        showAllCard.addEventListener('click', () => {
+            window.LavaAudio.playClick();
+            this.items = JSON.parse(JSON.stringify(PRESETS.char_traits));
+            this.saveState();
+            this.renderItems();
+            this.lamp.setItems(this.items);
+            
+            this.currentPresetName = 'Show All Traits';
+            localStorage.setItem('lava_selector_preset_name', this.currentPresetName);
+            if (this.presetTitle) this.presetTitle.textContent = `(${this.currentPresetName})`;
+        });
+        presetGrid.appendChild(showAllCard);
+
+        // 2. Group unique categories
+        const categories = [];
+        PRESETS.char_traits.forEach(item => {
+            if (item.trait_type && !categories.includes(item.trait_type)) {
+                categories.push(item.trait_type);
+            }
+        });
+
+        // Alphabetize categories for cleaner layout
+        categories.sort();
+
+        categories.forEach(category => {
+            const card = document.createElement('div');
+            card.className = 'preset-card';
+            card.textContent = category;
+            card.addEventListener('click', () => {
+                window.LavaAudio.playClick();
+                const filtered = PRESETS.char_traits.filter(item => item.trait_type === category);
+                this.items = JSON.parse(JSON.stringify(filtered));
+                this.saveState();
+                this.renderItems();
+                this.lamp.setItems(this.items);
+                
+                this.currentPresetName = category;
+                localStorage.setItem('lava_selector_preset_name', this.currentPresetName);
+                if (this.presetTitle) this.presetTitle.textContent = `(${this.currentPresetName})`;
+            });
+            presetGrid.appendChild(card);
+        });
+
+        // 3. Numbers 1-6
+        const numbersCard = document.createElement('div');
+        numbersCard.className = 'preset-card';
+        numbersCard.textContent = 'Numbers 1-6';
+        numbersCard.addEventListener('click', () => {
+            window.LavaAudio.playClick();
+            this.items = JSON.parse(JSON.stringify(PRESETS.numbers));
+            this.saveState();
+            this.renderItems();
+            this.lamp.setItems(this.items);
+            
+            this.currentPresetName = 'Numbers 1-6';
+            localStorage.setItem('lava_selector_preset_name', this.currentPresetName);
+            if (this.presetTitle) this.presetTitle.textContent = `(${this.currentPresetName})`;
+        });
+        presetGrid.appendChild(numbersCard);
+    }
+    
+    async loadMagicEdenAttributes() {
+        try {
+            let res;
+            try {
+                // Try direct API first (ideal for static hosts like GitHub Pages if CORS is open)
+                res = await fetch('https://api-mainnet.magiceden.dev/v2/collections/hauwee/attributes');
+            } catch (err) {
+                console.warn('Direct Magic Eden fetch failed/CORS blocked. Trying local proxy...');
+                // Fallback to local node proxy
+                res = await fetch('/api/attributes');
+            }
+            
+            if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+            const data = await res.json();
+            
+            this.traitCounts = {};
+            let attributesList = null;
+            
+            if (data && data.results && Array.isArray(data.results.availableAttributes)) {
+                attributesList = data.results.availableAttributes;
+            } else if (data && Array.isArray(data.availableAttributes)) {
+                attributesList = data.availableAttributes;
+            }
+            
+            if (Array.isArray(attributesList)) {
+                attributesList.forEach(item => {
+                    if (item && item.attribute) {
+                        const traitType = String(item.attribute.trait_type || '').toLowerCase().trim();
+                        const valName = String(item.attribute.value || '').toLowerCase().trim();
+                        
+                        // Sum all listing types to get total collection supply for this trait
+                        let count = 0;
+                        if (item.countByListingType) {
+                            Object.values(item.countByListingType).forEach(val => {
+                                count += parseInt(val) || 0;
+                            });
+                        } else {
+                            count = parseInt(item.count) || 0;
+                        }
+                        
+                        if (traitType && valName && !isNaN(count) && count > 0) {
+                            this.traitCounts[traitType + '::' + valName] = count;
+                        }
+                    }
+                });
+            }
+            console.log('Loaded Magic Eden trait counts successfully:', Object.keys(this.traitCounts).length, 'traits');
+        } catch (e) {
+            console.error('Failed to load Magic Eden attributes:', e);
+        }
+    }
+    
+    getTraitCount(winner) {
+        const type = String(winner.trait_type || '').toLowerCase().trim();
+        const value = String(winner.value || winner.text || '').toLowerCase().trim();
+        const key = type + '::' + value;
+        
+        // 1. Try Magic Eden loaded data
+        if (this.traitCounts && this.traitCounts[key] !== undefined) {
+            return this.traitCounts[key];
+        }
+        
+        // 2. Try parsing from filename (e.g. Purple Spray #54.005.png -> 54)
+        if (winner.image) {
+            const match = winner.image.match(/#(\d+)/);
+            if (match) {
+                const count = parseInt(match[1]);
+                if (!isNaN(count) && count > 0) {
+                    return count;
+                }
+            }
+        }
+        
+        // 3. Try to count occurrences in items list
+        const occurrences = this.items.filter(item => String(item.value || '').toLowerCase().trim() === value).length;
+        if (occurrences > 0) {
+            return occurrences;
+        }
+        
+        // 4. Default fallback
+        return 1;
     }
 }
 

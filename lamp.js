@@ -8,7 +8,7 @@ class LavaLamp {
         
         // Configuration
         this.baseWidth = 320;
-        this.height = 520;
+        this.height = 560;
         
         // Balanced physics constants for slow, organic bubble floating
         this.gravity = 0.12;
@@ -16,6 +16,10 @@ class LavaLamp {
         this.drag = 0.98;
         this.elasticity = 0.5; 
         this.overlapDampening = 0.05; 
+        
+        // Cartoon smoke/fart particle system
+        this.smokeParticles = [];
+        this.smokeSpawnCount = 0;
         
         this.bubbles = [];
         this.waxBlobs = []; // background green wax blobs
@@ -175,6 +179,7 @@ class LavaLamp {
     update(dt) {
         this.updateParticles();
         this.updateWaxBlobs(dt);
+        this.updateSmokeParticles(dt);
 
         if (this.state === 'shaking') {
             const elapsed = Date.now() - this.shakeTimer;
@@ -225,6 +230,7 @@ class LavaLamp {
                     this.state = 'showcase';
                     b.vx = 0;
                     b.vy = 0;
+                    this.triggerSmokeFart();
                     this.triggerWinnerShowcase();
                 }
             } else if (this.state === 'selecting' && b !== this.winnerBubble) {
@@ -399,6 +405,58 @@ class LavaLamp {
         });
     }
 
+    triggerSmokeFart() {
+        if (window.LavaAudio) {
+            window.LavaAudio.playFart();
+        }
+        for (let i = 0; i < 15; i++) {
+            this.smokeParticles.push(this.createSmokeParticle());
+        }
+        this.smokeSpawnCount = 45;
+    }
+
+    createSmokeParticle() {
+        const angle = -Math.PI / 2 + (Math.random() - 0.5) * 1.0;
+        const speed = 1.8 + Math.random() * 2.2;
+        return {
+            x: 160 + (Math.random() - 0.5) * 15,
+            y: 15 + (Math.random() - 0.5) * 6,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            radius: 8 + Math.random() * 8,
+            maxRadius: 28 + Math.random() * 14,
+            growth: 0.4 + Math.random() * 0.3,
+            opacity: 0.85 + Math.random() * 0.15,
+            decay: 0.012 + Math.random() * 0.008,
+            color: `rgba(${175 + Math.floor(Math.random() * 45)}, ${215 + Math.floor(Math.random() * 30)}, ${85 + Math.floor(Math.random() * 40)}, `
+        };
+    }
+
+    updateSmokeParticles(dt) {
+        if (this.smokeSpawnCount > 0) {
+            const spawnPerFrame = Math.random() < 0.4 ? 1 : 2;
+            for (let i = 0; i < spawnPerFrame; i++) {
+                this.smokeParticles.push(this.createSmokeParticle());
+            }
+            this.smokeSpawnCount--;
+        }
+
+        this.smokeParticles.forEach(p => {
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            p.vx *= Math.pow(0.96, dt);
+            p.vy *= Math.pow(0.96, dt);
+            p.vy -= 0.02 * dt;
+            
+            if (p.radius < p.maxRadius) {
+                p.radius += p.growth * dt;
+            }
+            p.opacity -= p.decay * dt;
+        });
+
+        this.smokeParticles = this.smokeParticles.filter(p => p.opacity > 0);
+    }
+
     triggerWinnerShowcase() {
         let duration = 800;
         let start = Date.now();
@@ -437,6 +495,8 @@ class LavaLamp {
             this.winnerBubble = null;
         }
         this.heatIndex = 1.0;
+        this.smokeParticles = [];
+        this.smokeSpawnCount = 0;
         
         const container = this.canvas.parentElement;
         if (container) {
@@ -537,6 +597,9 @@ class LavaLamp {
 
         // Draw foreground elements on main canvas (sharp cap, base, face, and bubbles)
         this.ctx.save();
+        this.ctx.translate(0, 40);
+
+        this.ctx.save();
         this.drawGlassPath(this.ctx);
         this.ctx.clip();
         this.drawForegroundBubbles();
@@ -567,6 +630,37 @@ class LavaLamp {
         this.ctx.clip();
         this.drawGlassRefractions();
         this.ctx.restore();
+
+        // Draw smoke particles
+        this.drawSmokeParticles();
+
+        this.ctx.restore();
+    }
+
+    drawSmokeParticles() {
+        this.ctx.save();
+        this.smokeParticles.forEach(p => {
+            this.ctx.globalAlpha = p.opacity;
+            
+            // Draw cartoon outline first
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, p.radius + 2.2, 0, Math.PI * 2);
+            this.ctx.fillStyle = '#000000';
+            this.ctx.fill();
+            
+            // Draw cartoon fill
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            this.ctx.fillStyle = p.color + '1.0)';
+            this.ctx.fill();
+
+            // Add specular shine highlight
+            this.ctx.beginPath();
+            this.ctx.arc(p.x - p.radius * 0.25, p.y - p.radius * 0.25, p.radius * 0.22, 0, Math.PI * 2);
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+            this.ctx.fill();
+        });
+        this.ctx.restore();
     }
 
     drawBackgroundWaxLayer() {
@@ -575,6 +669,7 @@ class LavaLamp {
         
         // Clip background wax to the glass path
         this.waxCtx.save();
+        this.waxCtx.translate(0, 40);
         this.drawGlassPath(this.waxCtx);
         this.waxCtx.clip();
         
