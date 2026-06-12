@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unicorn Butt Plug in Play</title>
-    <meta name="description" content="A cartoon-style, kawaii interactive character trait random selector styled like a classic lava lamp with liquid wax physics.">
+    <title>Unicorn Butt Plug & Play</title>
+    <meta name="description"
+        content="A cartoon-style, kawaii interactive character trait random selector styled like a classic lava lamp with liquid wax physics.">
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <!-- SVG Clip Path for Lava Lamp Glass -->
     <svg width="0" height="0" style="position: absolute;">
@@ -16,64 +19,77 @@
             </clipPath>
         </defs>
     </svg>
- 
+
     <!-- Background Animated Glow Orbs -->
     <div class="bg-glow-orbs">
         <div class="bg-orb bg-orb-1"></div>
         <div class="bg-orb bg-orb-2"></div>
     </div>
- 
+
     <div class="app-container">
         <!-- Collapsible Sidebar Panel -->
         <aside id="sidebar" class="sidebar">
             <!-- Collapsible Toggle Tab sticking out of sidebar -->
             <button id="drawerToggleTab" class="drawer-toggle-tab" title="Toggle Sidebar">
-                <svg id="toggleArrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg id="toggleArrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
             </button>
- 
+
             <div class="sidebar-header">
                 <h1><span>●</span> Trait Selector</h1>
             </div>
- 
+
             <div class="sidebar-content">
                 <!-- Section 1: Active Traits -->
                 <section>
                     <div class="section-title">
-                        Active Traits <span id="presetTitle" style="font-size: 0.8rem; color: var(--lamp-blue); font-weight: 600; text-transform: none; margin-left: 8px; margin-right: auto;">(Show All Traits)</span> <span id="itemCount" class="count">0</span>
+                        Active Traits <span id="presetTitle"
+                            style="font-size: 0.8rem; color: var(--lamp-blue); font-weight: 600; text-transform: none; margin-left: 8px; margin-right: auto;">(Show
+                            All Traits)</span> <span id="itemCount" class="count">0</span>
                     </div>
-                    
+
                     <!-- Collapsible Dropdown for custom trait input -->
                     <div class="collapsible-dropdown" style="margin-bottom: 16px;">
-                        <button id="addTraitToggle" class="btn" style="width: 100%; justify-content: space-between; padding: 10px 14px; border-radius: 8px;">
+                        <button id="addTraitToggle" class="btn"
+                            style="width: 100%; justify-content: space-between; padding: 10px 14px; border-radius: 8px;">
                             <span style="display: flex; align-items: center; gap: 6px;">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
                                 </svg>
                                 Add Custom Trait
                             </span>
-                            <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.25s ease;">
+                            <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"
+                                style="transition: transform 0.25s ease;">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
                         </button>
-                        <div id="addTraitContent" style="max-height: 0; overflow: hidden; transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
-                            <div class="input-group" style="flex-direction: column; gap: 8px; margin-top: 8px; padding: 12px; background: rgba(255, 255, 255, 0.05); border: var(--cartoon-border-thin); border-radius: 8px; margin-bottom: 4px;">
-                                <input type="text" id="itemInput" placeholder="Trait value (e.g. Gold Chain)..." maxlength="20" autocomplete="off" style="width: 100%;">
-                                <input type="text" id="itemTypeInput" placeholder="Trait type (e.g. OG_Chain)..." maxlength="20" autocomplete="off" style="width: 100%; border: var(--cartoon-border-thin); padding: 10px; border-radius: 8px; font-family: var(--font-rounded); font-weight: 500; outline: none; background: #fff; color: #000;">
-                                <button id="addItemBtn" class="btn" style="width: 100%; justify-content: center;" title="Add Custom Trait">
+                        <div id="addTraitContent"
+                            style="max-height: 0; overflow: hidden; transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+                            <div class="input-group"
+                                style="flex-direction: column; gap: 8px; margin-top: 8px; padding: 12px; background: rgba(255, 255, 255, 0.05); border: var(--cartoon-border-thin); border-radius: 8px; margin-bottom: 4px;">
+                                <input type="text" id="itemInput" placeholder="Trait value (e.g. Gold Chain)..."
+                                    maxlength="20" autocomplete="off" style="width: 100%;">
+                                <input type="text" id="itemTypeInput" placeholder="Trait type (e.g. OG_Chain)..."
+                                    maxlength="20" autocomplete="off"
+                                    style="width: 100%; border: var(--cartoon-border-thin); padding: 10px; border-radius: 8px; font-family: var(--font-rounded); font-weight: 500; outline: none; background: #fff; color: #000;">
+                                <button id="addItemBtn" class="btn" style="width: 100%; justify-content: center;"
+                                    title="Add Custom Trait">
                                     Add Trait
                                 </button>
                             </div>
                         </div>
                     </div>
- 
+
                     <div id="itemList" class="item-list">
                         <!-- Trait list rendered dynamically -->
                     </div>
                 </section>
- 
+
                 <!-- Section 2: Presets -->
                 <section>
                     <div class="section-title">Presets</div>
@@ -81,28 +97,28 @@
                         <!-- Rendered dynamically by app.js -->
                     </div>
                 </section>
- 
+
                 <!-- Section 3: Configurations -->
                 <section>
                     <div class="section-title">Settings</div>
-                    
+
                     <!-- Token Giveaway Info -->
-                    <div class="setting-row" style="flex-direction: column; align-items: stretch; gap: 6px; margin-bottom: 12px;">
+                    <div class="setting-row"
+                        style="flex-direction: column; align-items: stretch; gap: 6px; margin-bottom: 12px;">
                         <span class="setting-label" style="align-self: flex-start;">Token Prize Pool</span>
-                        <div style="font-family: var(--font-rounded); font-weight: 700; font-size: 1.15rem; color: var(--lamp-wax); background: rgba(0, 0, 0, 0.2); border: var(--cartoon-border-thin); padding: 10px; border-radius: 8px; text-align: center; text-shadow: 1px 1px 0 #000;">
+                        <div
+                            style="font-family: var(--font-rounded); font-weight: 700; font-size: 1.15rem; color: var(--lamp-wax); background: rgba(0, 0, 0, 0.2); border: var(--cartoon-border-thin); padding: 10px; border-radius: 8px; text-align: center; text-shadow: 1px 1px 0 #000;">
                             50,000 $UBP
                         </div>
-                        <span class="setting-label" style="align-self: flex-start; font-size: 0.8rem; color: var(--lamp-blue); margin-top: 4px; line-height: 1.3;">
-                            Prize is calculated automatically on selection: <br><strong>50,000 / Mint Count of Selected Trait</strong>
+                        <span class="setting-label"
+                            style="align-self: flex-start; font-size: 0.8rem; color: var(--lamp-blue); margin-top: 4px; line-height: 1.3;">
+                            Prize is calculated automatically on selection: <br><strong>50,000 / Mint Count of Selected
+                                Trait</strong>
                         </span>
                     </div>
- 
-                    <!-- Webhook URL Input -->
-                    <div class="setting-row" style="flex-direction: column; align-items: stretch; gap: 6px; margin-bottom: 12px;">
-                        <span class="setting-label" style="align-self: flex-start;">n8n Webhook URL</span>
-                        <input type="url" id="webhookUrlInput" placeholder="https://primary-production.io/webhook/..." style="width: 100%; border: var(--cartoon-border-thin); padding: 10px; border-radius: 8px; font-family: var(--font-rounded); font-weight: 500; outline: none; background: #fff; color: #000;">
-                    </div>
- 
+
+
+
                     <div class="setting-row">
                         <span class="setting-label">Sound Effects</span>
                         <label class="switch">
@@ -110,15 +126,17 @@
                             <span class="slider"></span>
                         </label>
                     </div>
- 
+
                     <div class="setting-row">
                         <span class="setting-label">Sound Volume</span>
-                        <input type="range" id="volumeSlider" class="range-slider" min="0" max="1" step="0.05" value="0.5">
+                        <input type="range" id="volumeSlider" class="range-slider" min="0" max="1" step="0.05"
+                            value="0.5">
                     </div>
- 
+
                     <div class="setting-row">
                         <span class="setting-label">Fluid Speed</span>
-                        <input type="range" id="speedSlider" class="range-slider" min="0.5" max="2" step="0.1" value="1.0">
+                        <input type="range" id="speedSlider" class="range-slider" min="0.5" max="2" step="0.1"
+                            value="1.0">
                     </div>
                 </section>
             </div>
@@ -127,39 +145,48 @@
         <!-- Collapsible Right Sidebar Panel for History -->
         <aside id="historySidebar" class="sidebar sidebar-right collapsed">
             <!-- Collapsible Toggle Tab sticking out of sidebar -->
-            <button id="historyDrawerToggleTab" class="drawer-toggle-tab drawer-toggle-tab-right" title="Toggle History">
-                <svg id="historyToggleArrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+            <button id="historyDrawerToggleTab" class="drawer-toggle-tab drawer-toggle-tab-right"
+                title="Toggle History">
+                <svg id="historyToggleArrow" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
             </button>
- 
+
             <div class="sidebar-header">
                 <h1 style="color: var(--lamp-pink);"><span style="color: var(--lamp-blue);">●</span> History</h1>
             </div>
- 
+
             <div class="sidebar-content">
                 <div class="section-title">Selection History</div>
                 <div id="historyList" class="history-list" style="max-height: calc(100vh - 120px);">
-                    <div class="history-item" style="color: var(--text-muted); justify-content: center; border: none; background: none;">
+                    <div class="history-item"
+                        style="color: var(--text-muted); justify-content: center; border: none; background: none;">
                         No history yet
                     </div>
                 </div>
             </div>
         </aside>
- 
+
         <!-- Main Display Area -->
         <main class="main-display">
             <div class="header-tagline">
-                <h2 data-text="Unicorn Butt Plug in Play">Unicorn Butt Plug in Play</h2>
+                <h3 class="sub-title-top" data-text="HIGH AS UNICORN">HIGH AS UNICORN</h3>
+                <h2 data-text="Unicorn Butt Plug & Play">Unicorn Butt Plug & Play</h2>
                 <p>Set token giveaway, then agitate fluids to select a trait</p>
             </div>
- 
+
+            <!-- Active Category Display -->
+            <div id="activePresetDisplay" class="active-preset-display">
+                Selecting: <span id="activePresetName">Show All Traits</span>
+            </div>
+
             <!-- Lava Lamp Assembly (Dual canvases: wax Canvas for background, lamp Canvas for foreground outlines & bubbles) -->
             <div class="lava-lamp-container">
                 <canvas id="waxCanvas"></canvas>
                 <canvas id="lampCanvas"></canvas>
             </div>
- 
+
             <!-- Agitate Trigger -->
             <div class="spin-action-wrapper">
                 <button id="spinBtn" class="btn btn-spin">Agitate Lamp</button>
@@ -174,34 +201,35 @@
             </div>
         </main>
     </div>
- 
+
     <!-- Win Result Modal Overlay -->
     <div id="resultOverlay" class="result-overlay">
         <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
-        
+
         <div class="result-card">
             <div class="result-content">
                 <div class="result-badge">Congratulations!</div>
-                
+
                 <!-- Selected Trait Cartoon Image Display -->
                 <div class="winner-image-wrapper">
                     <img id="winnerTraitImage" src="" alt="Selected Trait">
                 </div>
-                
+
                 <h3 id="winnerText" class="winner-text">Trait Name</h3>
                 <div class="badge-wrapper">
                     <p id="winnerSubtext" class="winner-subtext">win 100 Tokens!</p>
                 </div>
-                
+
                 <button id="closeResultBtn" class="btn" style="width: 100%;">Claim</button>
             </div>
         </div>
     </div>
- 
+
     <!-- Scripts -->
     <script src="audio.js"></script>
     <script src="lamp.js"></script>
     <script src="traits.js"></script>
     <script src="app.js"></script>
 </body>
+
 </html>

@@ -43,7 +43,7 @@ class LavaSelectorApp {
         this.confettiActive = false;
 
         this.lamp = null;
-
+        
         this.init();
     }
 
@@ -128,11 +128,7 @@ class LavaSelectorApp {
             this.speedSlider.value = storedSpeed;
         }
 
-        const storedWebhook = localStorage.getItem('lava_selector_webhook_url');
-        const webhookUrlInput = document.getElementById('webhookUrlInput');
-        if (storedWebhook !== null && webhookUrlInput) {
-            webhookUrlInput.value = storedWebhook;
-        }
+
 
         // Preset title element
         this.presetTitle = document.getElementById('presetTitle');
@@ -141,6 +137,11 @@ class LavaSelectorApp {
         if (this.presetTitle) {
             this.presetTitle.textContent = `(${this.currentPresetName})`;
         }
+        
+        const activeNameEl = document.getElementById('activePresetName');
+        if (activeNameEl) {
+            activeNameEl.textContent = this.currentPresetName;
+        }
 
         this.traitCounts = {};
     }
@@ -148,6 +149,18 @@ class LavaSelectorApp {
     saveState() {
         localStorage.setItem('lava_selector_traits_v3', JSON.stringify(this.items));
         localStorage.setItem('lava_selector_trait_history_v3', JSON.stringify(this.history));
+    }
+
+    updatePresetName(name) {
+        this.currentPresetName = name;
+        localStorage.setItem('lava_selector_preset_name', name);
+        if (this.presetTitle) {
+            this.presetTitle.textContent = `(${name})`;
+        }
+        const activeNameEl = document.getElementById('activePresetName');
+        if (activeNameEl) {
+            activeNameEl.textContent = name;
+        }
     }
 
     bindEvents() {
@@ -217,13 +230,6 @@ class LavaSelectorApp {
             localStorage.setItem('lava_selector_speed', e.target.value);
         });
 
-        const webhookUrlInput = document.getElementById('webhookUrlInput');
-        if (webhookUrlInput) {
-            webhookUrlInput.addEventListener('input', (e) => {
-                localStorage.setItem('lava_selector_webhook_url', e.target.value.trim());
-            });
-        }
-
         // Agitate/Spin Button
         this.spinBtn.addEventListener('click', () => {
             const activeCount = this.items.filter(item => item.active).length;
@@ -246,33 +252,29 @@ class LavaSelectorApp {
             window.LavaAudio.playClick();
 
             // Webhook dispatch logic
-            const webhookUrl = localStorage.getItem('lava_selector_webhook_url');
-            if (webhookUrl && webhookUrl.trim() !== '') {
-                const payload = {
-                    value: this.winnerText.textContent,
-                    trait_type: this.lastWinnerTraitType || 'Helmets',
-                    amount: this.currentPrizeTokens || 0
-                };
+            const webhookUrl = 'https://lavawheel-n8n-backend.onrender.com/webhook/solana-snapshot';
+            const payload = {
+                value: this.lastWinnerValue || '',
+                trait_type: this.lastWinnerTraitType || 'Helmets',
+                amount: this.currentPrizeTokens || 0
+            };
 
-                console.log('Sending webhook trigger to:', webhookUrl);
-                console.log('Webhook Payload:', JSON.stringify(payload, null, 2));
+            console.log('Sending webhook trigger to:', webhookUrl);
+            console.log('Webhook Payload:', JSON.stringify(payload, null, 2));
 
-                fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(res => {
+                    console.log('Webhook dispatch response status:', res.status);
                 })
-                    .then(res => {
-                        console.log('Webhook dispatch response status:', res.status);
-                    })
-                    .catch(err => {
-                        console.error('Webhook dispatch failed:', err);
-                    });
-            } else {
-                console.log('No Webhook URL configured. Skipping webhook dispatch.');
-            }
+                .catch(err => {
+                    console.error('Webhook dispatch failed:', err);
+                });
 
             this.resultOverlay.classList.remove('active');
             this.confettiActive = false;
@@ -348,9 +350,7 @@ class LavaSelectorApp {
         this.renderItems();
         this.lamp.setItems(this.items);
 
-        this.currentPresetName = 'Custom';
-        localStorage.setItem('lava_selector_preset_name', this.currentPresetName);
-        if (this.presetTitle) this.presetTitle.textContent = `(${this.currentPresetName})`;
+        this.updatePresetName('Custom');
 
         this.itemInput.value = '';
         if (typeInput) typeInput.value = '';
@@ -364,9 +364,7 @@ class LavaSelectorApp {
         this.renderItems();
         this.lamp.setItems(this.items);
 
-        this.currentPresetName = 'Custom';
-        localStorage.setItem('lava_selector_preset_name', this.currentPresetName);
-        if (this.presetTitle) this.presetTitle.textContent = `(${this.currentPresetName})`;
+        this.updatePresetName('Custom');
     }
 
     toggleItemActive(id) {
@@ -381,9 +379,7 @@ class LavaSelectorApp {
         this.renderItems();
         this.lamp.setItems(this.items);
 
-        this.currentPresetName = 'Custom';
-        localStorage.setItem('lava_selector_preset_name', this.currentPresetName);
-        if (this.presetTitle) this.presetTitle.textContent = `(${this.currentPresetName})`;
+        this.updatePresetName('Custom');
     }
 
     disableItemListActions(disabled) {
@@ -474,6 +470,7 @@ class LavaSelectorApp {
     handleWinner(winner) {
         this.lastWinnerTraitType = winner.trait_type || 'Helmets';
         const winnerValue = winner.value || winner.text || '';
+        this.lastWinnerValue = winnerValue;
 
         // Calculate dynamic prize based on Magic Eden attributes count
         const traitCount = this.getTraitCount(winner);
@@ -613,9 +610,7 @@ class LavaSelectorApp {
             this.renderItems();
             this.lamp.setItems(this.items);
 
-            this.currentPresetName = 'Show All Traits';
-            localStorage.setItem('lava_selector_preset_name', this.currentPresetName);
-            if (this.presetTitle) this.presetTitle.textContent = `(${this.currentPresetName})`;
+            this.updatePresetName('Show All Traits');
         });
         presetGrid.appendChild(showAllCard);
 
@@ -642,9 +637,7 @@ class LavaSelectorApp {
                 this.renderItems();
                 this.lamp.setItems(this.items);
 
-                this.currentPresetName = category;
-                localStorage.setItem('lava_selector_preset_name', this.currentPresetName);
-                if (this.presetTitle) this.presetTitle.textContent = `(${this.currentPresetName})`;
+                this.updatePresetName(category);
             });
             presetGrid.appendChild(card);
         });
@@ -660,9 +653,7 @@ class LavaSelectorApp {
             this.renderItems();
             this.lamp.setItems(this.items);
 
-            this.currentPresetName = 'Numbers 1-6';
-            localStorage.setItem('lava_selector_preset_name', this.currentPresetName);
-            if (this.presetTitle) this.presetTitle.textContent = `(${this.currentPresetName})`;
+            this.updatePresetName('Numbers 1-6');
         });
         presetGrid.appendChild(numbersCard);
     }
@@ -765,6 +756,7 @@ class LavaSelectorApp {
         // 4. Default fallback
         return 1;
     }
+
 }
 
 
