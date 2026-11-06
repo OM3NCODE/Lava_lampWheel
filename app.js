@@ -474,12 +474,12 @@ class LavaSelectorApp {
 
         // Calculate dynamic prize based on Magic Eden attributes count
         const traitCount = this.getTraitCount(winner);
-        const prize = Math.round(50000 / traitCount);
+        const prize = Math.round(33000 / traitCount);
         this.currentPrizeTokens = prize;
 
         console.log(`[Winner Selected] Trait: "${winnerValue}" | Type: "${this.lastWinnerTraitType}"`);
         console.log(`- Resolved Mint Count: ${traitCount}`);
-        console.log(`- Payout Calculation: 50,000 / ${traitCount} = ${prize} $UBP`);
+        console.log(`- Payout Calculation: 33,000 / ${traitCount} = ${prize} $UBP`);
 
         const record = {
             value: winnerValue,
