@@ -5,7 +5,7 @@ const PRESETS = {
             "id": "t1",
             "value": "Purple",
             "color": "#a855f7",
-            "image": "assets/Background/Purple Spray #54.005.png",
+            "image": "assets/Background/Purple#180.018.png",
             "active": true,
             "trait_type": "Background"
         },
@@ -325,7 +325,7 @@ const PRESETS = {
             "id": "t41",
             "value": "LFGO Logo",
             "color": "#f43f5e",
-            "image": "assets/Hoodie Deco/LFGO #9.001.png",
+            "image": "assets/Hoodie Deco/LFGO Logo #45.005.png",
             "active": true,
             "trait_type": "Hoodie Deco"
         },
@@ -349,7 +349,7 @@ const PRESETS = {
             "id": "t44",
             "value": "Yellow",
             "color": "#eab308",
-            "image": "assets/Face/Yellow with Blue Freckles.png",
+            "image": "assets/Face/Yellow.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -357,7 +357,7 @@ const PRESETS = {
             "id": "t45",
             "value": "Yellow with Pink Freckles",
             "color": "#f59e0b",
-            "image": "assets/Face/Pink.png",
+            "image": "assets/Face/Yellow with Pink Freckles.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -365,7 +365,7 @@ const PRESETS = {
             "id": "t46",
             "value": "Yellow with Blue Freckles",
             "color": "#eab308",
-            "image": "assets/Face/Blue.png",
+            "image": "assets/Face/Yellow with Blue Freckles.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -373,7 +373,7 @@ const PRESETS = {
             "id": "t47",
             "value": "Yellow with Pink Freckles 2",
             "color": "#eab308",
-            "image": "assets/Face/Pink.png",
+            "image": "assets/Face/Yellow with Pink Freckles 2.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -381,7 +381,7 @@ const PRESETS = {
             "id": "t48",
             "value": "Yellow with Purple Freckles",
             "color": "#eab308",
-            "image": "assets/Face/Purple.png",
+            "image": "assets/Face/Yellow with Purple Freckles.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -389,7 +389,7 @@ const PRESETS = {
             "id": "t49",
             "value": "Grey",
             "color": "#64748b",
-            "image": "assets/Face/Grey with Blue Freckles.png",
+            "image": "assets/Face/Grey.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -397,7 +397,7 @@ const PRESETS = {
             "id": "t50",
             "value": "Grey with Pink Freckles",
             "color": "#94a3b8",
-            "image": "assets/Face/Grey with Pink Freckles 2.png",
+            "image": "assets/Face/Grey with Pink Freckles.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -405,7 +405,7 @@ const PRESETS = {
             "id": "t51",
             "value": "Grey with Blue Freckles",
             "color": "#64748b",
-            "image": "assets/Face/Blue.png",
+            "image": "assets/Face/Grey with Blue Freckles.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -429,7 +429,7 @@ const PRESETS = {
             "id": "t54",
             "value": "Green",
             "color": "#22c55e",
-            "image": "assets/Face/Green with Blue Freckles.png",
+            "image": "assets/Face/Green.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -437,7 +437,7 @@ const PRESETS = {
             "id": "t55",
             "value": "Green with Pink Freckles",
             "color": "#10b981",
-            "image": "assets/Face/Green with Pink Freckles 2.png",
+            "image": "assets/Face/Green with Pink Freckles.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -445,7 +445,7 @@ const PRESETS = {
             "id": "t56",
             "value": "Green with Blue Freckles",
             "color": "#22c55e",
-            "image": "assets/Face/Blue.png",
+            "image": "assets/Face/Green with Blue Freckles.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -469,7 +469,7 @@ const PRESETS = {
             "id": "t59",
             "value": "Pink",
             "color": "#ec4899",
-            "image": "assets/Face/Blue with Pink Freckles 2.png",
+            "image": "assets/Face/Pink.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -477,7 +477,7 @@ const PRESETS = {
             "id": "t60",
             "value": "Pink with Blue Freckles",
             "color": "#f472b6",
-            "image": "assets/Face/Blue.png",
+            "image": "assets/Face/Pink with Blue Freckles.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -493,7 +493,7 @@ const PRESETS = {
             "id": "t62",
             "value": "Purple",
             "color": "#8b5cf6",
-            "image": "assets/Face/Blue with Purple Freckles.png",
+            "image": "assets/Face/Purple.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -501,7 +501,7 @@ const PRESETS = {
             "id": "t63",
             "value": "Purple with Pink Freckles",
             "color": "#a855f7",
-            "image": "assets/Face/Pink.png",
+            "image": "assets/Face/Purple with Pink Freckles.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -509,7 +509,7 @@ const PRESETS = {
             "id": "t64",
             "value": "Purple with Blue Freckles",
             "color": "#8b5cf6",
-            "image": "assets/Face/Blue.png",
+            "image": "assets/Face/Purple with Blue Freckles.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -517,7 +517,7 @@ const PRESETS = {
             "id": "t65",
             "value": "Purple with Pink Freckles 2",
             "color": "#8b5cf6",
-            "image": "assets/Face/Pink.png",
+            "image": "assets/Face/Purple with Pink Freckles 2.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -525,7 +525,7 @@ const PRESETS = {
             "id": "t66",
             "value": "Blue",
             "color": "#3b82f6",
-            "image": "assets/Face/Blue with Pink Freckles 2.png",
+            "image": "assets/Face/Blue.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -533,7 +533,7 @@ const PRESETS = {
             "id": "t67",
             "value": "Blue with Pink Freckles",
             "color": "#60a5fa",
-            "image": "assets/Face/Blue with Pink Freckles 2.png",
+            "image": "assets/Face/Blue with Pink Freckles.png",
             "active": true,
             "trait_type": "Face"
         },
@@ -629,7 +629,7 @@ const PRESETS = {
             "id": "t79",
             "value": "Green with Blue Lizard",
             "color": "#14b8a6",
-            "image": "assets/Eyes/Blue Lizard #18.002.png",
+            "image": "assets/Eyes/Green with Blue Lizard #18.002.png",
             "active": true,
             "trait_type": "Eyes"
         },

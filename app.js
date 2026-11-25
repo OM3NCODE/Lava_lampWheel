@@ -76,17 +76,19 @@ class LavaSelectorApp {
 
     loadState() {
         // Load options
-        const storedItems = localStorage.getItem('lava_selector_traits_v3');
+        const presetMap = new Map(PRESETS.char_traits.map(p => [p.id, p]));
+        const storedItems = localStorage.getItem('lava_selector_traits_v4');
         if (storedItems) {
             try {
                 this.items = JSON.parse(storedItems).map(item => {
-                    const val = item.value || item.text || '';
+                    const preset = presetMap.get(item.id);
+                    const val = (preset ? preset.value : (item.value || item.text)) || '';
                     return {
                         id: item.id || (Date.now().toString() + Math.random().toString(36).substr(2, 5)),
                         value: String(val).trim(),
-                        color: item.color || '#38bdf8',
-                        image: item.image || '',
-                        trait_type: item.trait_type || 'Helmets',
+                        color: item.color || (preset ? preset.color : '#38bdf8'),
+                        image: preset ? preset.image : (item.image || ''),
+                        trait_type: (preset ? preset.trait_type : item.trait_type) || 'Helmets',
                         active: item.active !== false
                     };
                 }).filter(item => item.value && item.value !== 'undefined' && item.value !== 'null');
@@ -147,7 +149,7 @@ class LavaSelectorApp {
     }
 
     saveState() {
-        localStorage.setItem('lava_selector_traits_v3', JSON.stringify(this.items));
+        localStorage.setItem('lava_selector_traits_v4', JSON.stringify(this.items));
         localStorage.setItem('lava_selector_trait_history_v3', JSON.stringify(this.history));
     }
 
